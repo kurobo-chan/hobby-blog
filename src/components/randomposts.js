@@ -54,8 +54,8 @@ export default function Home(props) {
             </figure>
             <div className="grid12">
               <div className="text">
-                <h1>{node.title}</h1>
-                <p>{node.preface}</p>
+                <h1>{`${node.title.slice(0, 20)}...`}</h1>
+                <p>{`${node.preface.slice(0, 70)}...`}</p>
               </div>
             </div>
           </article>
