@@ -1,109 +1,89 @@
 import React from "react"
+import { graphql, Link, useStaticQuery } from "gatsby"
+import Imgix from "react-imgix"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCoffee } from "@fortawesome/free-solid-svg-icons"
+import {
+  faClock,
+  faChevronRight,
+  faFolderOpen,
+} from "@fortawesome/free-solid-svg-icons"
 
-export default function Home()
-{
-	return (
+export default function Home() {
+  const data = useStaticQuery(graphql`
+    query {
+      allMicrocmsBlog(
+        sort: { order: DESC, fields: publishDate }
+        skip: 0
+        limit: 4
+      ) {
+        edges {
+          node {
+            id
+            slug
+            title
+            eyecatch {
+              url
+            }
+            eyecatchcaption
+            publishDateJP: publishDate(formatString: "YYYY.MM.DD")
+            publishDate
+            category {
+              category
+              categorySlug
+              id
+            }
+          }
+        }
+      }
+    }
+  `)
+  return (
     <div className="partsGrid">
       <aside className="aside">
         <h2>
           <span>RECENT ARTICLES</span>
         </h2>
         <div className="grid12 postBlock">
-          <article className="post">
-            <figure className="eyecatch">
-              <a href="#">
-                <img src="/image/test.jpg" alt="" />
-              </a>
-            </figure>
-            <div className="text">
-              <h3>
-                <a href="#">タイトルがここに入ります。タイトルがここに...</a>
-              </h3>
-              <div className="subText">
-                <time dateTime="2020-11-11">
-                  <FontAwesomeIcon icon={faCoffee} />
-                  <span> 2020.11.10</span>
-                </time>
-                <a href="#" className="category">
-                  <i className="fas fa-folder-open" />
-                  <span>カテゴリー</span>
-                </a>
+          {data.allMicrocmsBlog.edges.map(({ node }) => (
+            <article className="post" key={node.id}>
+              <figure className="eyecatch">
+                <Link to={`/blog/post/${node.slug}`}>
+                  <Imgix
+                    src={node.eyecatch.url}
+                    imgixParams={{ ar: "16:9", fit: "fill" }}
+                    htmlAttributes={{
+                      alt: node.eyecatchcaption,
+                    }}
+                  />
+                </Link>
+              </figure>
+              <div className="text">
+                <h3>
+                  <Link to={`/blog/post/${node.slug}`}>
+                    {`${node.title.slice(0, 20)}...`}
+                  </Link>
+                </h3>
+                <div className="subText">
+                  <time dateTime={node.publishDate}>
+                    <FontAwesomeIcon icon={faClock} />
+                    <span>{node.publishDateJP}</span>
+                  </time>
+                  {node.category.map(cat => (
+                    <a href="#" className="category" key={cat.id}>
+                      <FontAwesomeIcon icon={faFolderOpen} />
+                      <span>{cat.category}</span>
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          </article>
-          <article className="post">
-            <figure className="eyecatch">
-              <a href="#">
-                <img src="/image/test.jpg" alt="" />
-              </a>
-            </figure>
-            <div className="text">
-              <h3>
-                <a href="#">タイトルがここに入ります。タイトルがここに...</a>
-              </h3>
-              <div className="subText">
-                <time dateTime="2020-11-11">
-                  <i className="fas fa-clock" />
-                  <span> 2020.11.10</span>
-                </time>
-                <a href="#" className="category">
-                  <i className="fas fa-folder-open" />
-                  <span>カテゴリー</span>
-                </a>
-              </div>
-            </div>
-          </article>
-          <article className="post">
-            <figure className="eyecatch">
-              <a href="#">
-                <img src="/image/test.jpg" alt="" />
-              </a>
-            </figure>
-            <div className="text">
-              <h3>
-                <a href="#">タイトルがここに入ります。タイトルがここに...</a>
-              </h3>
-              <div className="subText">
-                <time dateTime="2020-11-11">
-                  <i className="fas fa-clock" />
-                  <span> 2020.11.10</span>
-                </time>
-                <a href="#" className="category">
-                  <i className="fas fa-folder-open" />
-                  <span>カテゴリー</span>
-                </a>
-              </div>
-            </div>
-          </article>
-          <article className="post">
-            <figure className="eyecatch">
-              <a href="#">
-                <img src="/image/test.jpg" alt="" />
-              </a>
-            </figure>
-            <div className="text">
-              <h3>
-                <a href="#">タイトルがここに入ります。タイトルがここに...</a>
-              </h3>
-              <div className="subText">
-                <time dateTime="2020-11-11">
-                  <i className="fas fa-clock" />
-                  <span> 2020.11.10</span>
-                </time>
-                <a href="#" className="category">
-                  <i className="fas fa-folder-open" />
-                  <span>カテゴリー</span>
-                </a>
-              </div>
-            </div>
-          </article>
+            </article>
+          ))}
+
           <div className="pagination">
-            <a href="#">
+            <Link to={`/blog/`}>
               <span>SEE MORE</span>
-              <i className="fas fa-chevron-right" />
-            </a>
+              <FontAwesomeIcon icon={faChevronRight} />
+            </Link>
           </div>
         </div>
       </aside>

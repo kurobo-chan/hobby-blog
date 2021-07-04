@@ -1,10 +1,43 @@
 import React from "react"
-import { Link } from "gatsby"
+import { graphql, useStaticQuery, Link } from "gatsby"
+import Imgix from "react-imgix"
+import RandomPosts from "../components/randompostsList"
 
 export default function Home() {
   const navFunc = () => {
     document.querySelector("html").classList.toggle("open")
   }
+  const data = useStaticQuery(graphql`
+    query {
+      allMicrocmsBlog(skip: 0, limit: 5) {
+        edges {
+          node {
+            category {
+              category
+              categorySlug
+              id
+            }
+            tag {
+              tag
+              tagSlug
+              id
+            }
+            blogId
+            id
+          }
+        }
+      }
+      microcmsProfile {
+        profileName
+        profileImg {
+          url
+        }
+        profileMessage
+        contactName
+        contactUrl
+      }
+    }
+  `)
   return (
     <div>
       <div className="partsGrid insetShadow">
@@ -36,7 +69,12 @@ export default function Home() {
               </g>
             </svg>
           </Link>
-          <a href="#" className="link">
+          <a
+            href="https://kurobo-note.netlify.app"
+            className="link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span>
               KUROBO
               <br />
@@ -51,34 +89,43 @@ export default function Home() {
             <div className="content profile">
               <div className="imgBlock">
                 <figure className="profileImg">
-                  <img src="/image/kurobo.svg" alt="" />
-                  <figcaption>KUROBO</figcaption>
+                  <Imgix
+                    src={data.microcmsProfile.profileImg.url}
+                    imgixParams={{ fit: "fill" }}
+                    htmlAttributes={{
+                      alt: data.microcmsProfile.profileName,
+                    }}
+                  />
+                  <figcaption>{data.microcmsProfile.profileName}</figcaption>
                 </figure>
-                <a href="#">
-                  <span>@kurobochan</span>
+                <a
+                  href={data.microcmsProfile.contactUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>{data.microcmsProfile.contactName}</span>
                 </a>
               </div>
-              <p>
-                テキストがここに入ります。テキストがここに入ります。テキストがここに入ります。テキストがここに入ります。テキストがここに入ります。テキストがここに入ります。テキストがここに入ります。
-              </p>
+              <p>{data.microcmsProfile.profileMessage}</p>
             </div>
             <div className="content category">
               <h3>
                 <span>CATEGORY</span>
               </h3>
               <ul className="categryBlock contentBlock">
-                <li>
-                  <a href="#">カテゴリータイトル</a>
-                </li>
-                <li>
-                  <a href="#">カテゴリータイトル</a>
-                </li>
-                <li>
-                  <a href="#">カテゴリータイトル</a>
-                </li>
-                <li>
-                  <a href="#">カテゴリータイトル</a>
-                </li>
+                {data.allMicrocmsBlog.edges.map(({ node }) => (
+                  <li key={node.blogId}>
+                    {node.category.map(cat => (
+                      <Link
+                        to={`/cat/${cat.categorySlug}/`}
+                        key={cat}
+                        onClick={navFunc}
+                      >
+                        {cat.category}
+                      </Link>
+                    ))}
+                  </li>
+                ))}
               </ul>
             </div>
             <div className="content tag">
@@ -86,38 +133,26 @@ export default function Home() {
                 <span>TAG</span>
               </h3>
               <ul className="tagBlock contentBlock">
-                <li>
-                  <a href="#">タグタイトル</a>
-                </li>
-                <li>
-                  <a href="#">タグタイトル</a>
-                </li>
-                <li>
-                  <a href="#">タグタイトル</a>
-                </li>
-                <li>
-                  <a href="#">タグタイトル</a>
-                </li>
+                {data.allMicrocmsBlog.edges.map(({ node }) => (
+                  <li key={node.id}>
+                    {node.tag.map(cat => (
+                      <Link
+                        to={`/tag/${cat.tagSlug}/`}
+                        key={cat.id}
+                        onClick={navFunc}
+                      >
+                        {cat.tag}
+                      </Link>
+                    ))}
+                  </li>
+                ))}
               </ul>
             </div>
             <div className="content pickup">
               <h3>
                 <span>PICK UP</span>
               </h3>
-              <ul className="pickupBlock contentBlock">
-                <li>
-                  <a href="#">ピックアップタイトル</a>
-                </li>
-                <li>
-                  <a href="#">ピックアップタイトル</a>
-                </li>
-                <li>
-                  <a href="#">ピックアップタイトル</a>
-                </li>
-                <li>
-                  <a href="#">ピックアップタイトル</a>
-                </li>
-              </ul>
+              <RandomPosts a_number={5} />
             </div>
           </div>
         </div>

@@ -2,10 +2,14 @@ import React from "react"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 
-export default function Home() {
+export default function Home({ location }) {
   return (
     <Layout>
-      <SEO pagetitle="プライバシーポリシー" pagedesc="KUROBO HOBBY BOLGのプライバシーポリシーページです"/>
+      <SEO
+        pagetitle="プライバシーポリシー"
+        pagedesc="KUROBO HOBBY BOLGのプライバシーポリシーページです"
+        pagepath={location.pathname}
+      />
       <main className="partsGrid main privacypolicy">
         <div className="grid12 privacyBlock">
           <h1>
